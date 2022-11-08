@@ -5,13 +5,12 @@ package program;
  */
 abstract public class Field {
 	
+	protected Table table;
+	
 	
 	/**
 	 * Checks if the line passes through the node correctly
 	 * @return
 	 */
-	public boolean passThroughCheck() {
-		boolean ret = true;
-		return ret;
-	}
+	abstract public boolean passThroughCheck();
 }

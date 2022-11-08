@@ -22,7 +22,7 @@ public class Main {
 			e.printStackTrace();
 		}
 		*/
-		MenuFrame frame = new MenuFrame();
+		GameFrame frame = new GameFrame();
 		frame.setVisible(true);
 	}
 }

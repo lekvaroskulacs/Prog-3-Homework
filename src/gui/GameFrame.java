@@ -7,11 +7,11 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.io.*;
 
-public class MenuFrame extends JFrame{
+public class GameFrame extends JFrame{
 	
 	Container contentPane;
 	
-	public MenuFrame() {
+	public GameFrame() {
 		super("Masyu");
 		setSize(1920, 1080);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
