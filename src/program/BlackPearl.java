@@ -10,4 +10,7 @@ public class BlackPearl extends Field {
 		return true;
 	}
 	
+	public String toString() {
+		return "BlackPearl";
+	}
 }

@@ -22,7 +22,12 @@ public class Main {
 			e.printStackTrace();
 		}
 		*/
+		/*
 		GameFrame frame = new GameFrame();
 		frame.setVisible(true);
+		*/
+		Table t = new Table("gamesave1.dat");
+
+		System.out.println(t.getFieldAt(2, 5).toString());
 	}
 }

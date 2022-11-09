@@ -10,4 +10,8 @@ public class BlankField extends Field {
 		return true;
 	}
 	
+	public String toString() {
+		return "BlankField";
+	}
+	
 }

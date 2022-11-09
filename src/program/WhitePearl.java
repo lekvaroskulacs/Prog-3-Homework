@@ -9,5 +9,9 @@ public class WhitePearl extends Field {
 	public boolean passThroughCheck() {
 		return true;
 	}
+	
+	public String toString() {
+		return "WhitePearl";
+	}
 
 }
