@@ -29,5 +29,16 @@ public class Main {
 		Table t = new Table("gamesave1.dat");
 
 		System.out.println(t.getFieldAt(2, 5).toString());
+		
+		t.startLine(t.getFieldAt(0, 2));
+		t.addLinePiece(t.getFieldAt(1, 2));
+		t.addLinePiece(t.getFieldAt(1, 1));
+		
+		Field[] f = t.line.getElements(0, t.line.numOfNodes()-1);
+		for (Field asd : f) {
+			System.out.println(asd.toString());
+		}
+		//System.out.println(t.line.getStart().toString());
+		//System.out.println(t.line.getEnd().toString());
 	}
 }

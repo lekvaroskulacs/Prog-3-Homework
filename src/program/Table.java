@@ -8,7 +8,9 @@ public class Table {
 	
 	private Field fields[][];
 	
-	private DrawnLine line;
+	public DrawnLine line;
+	
+	private LineRollBack rollBack;
 	
 	//tested, works fine.
 	//parses a file, and initializes fields[][] based on it
@@ -41,6 +43,7 @@ public class Table {
 	
 	//constructor
 	public Table(String filename) {	
+		rollBack = new LineRollBack(5);
 		//if loading non-saved table
 		try {
 			parseTableFromFile(filename);
@@ -48,7 +51,8 @@ public class Table {
 			ioe.printStackTrace();
 		}
 		line = null;
-		//if loading saved table
+		rollBack.push(line);
+		//if loading user saved table
 	}
 	
 	//returns the Field at the given positions
@@ -56,19 +60,32 @@ public class Table {
 		return fields[y][x];
 	}
 	
+	//called on mouse press
 	public void startLine(Field startNode) {
 		//need to handle some stuff here based on specification
-		if (line != null) {
-			//do stuff here
-		} else {
-			line = new DrawnLine(startNode);
-		}
-		
+		//if there is no previous line make a new line. 
+		//If there is, write to rollback
+		if (line != null) 
+			rollBack.push(line);
+		line = new DrawnLine(startNode);
 	}
 	
+	//called on mouse drag
 	public void addLinePiece(Field nextNode) {
 		//need to handle stuff here too
+		if (line.contains(nextNode)) {
+			//stop drawing mode here
+			endLine();
+		}
 		line.addNode(nextNode);
+	}
+	
+	//called on mouse release
+	public void endLine() {
+		if (line.getStart() == rollBack.getLast().getStart() || line.getStart() == rollBack.getLast().getEnd() ||
+			line.getEnd() == rollBack.getLast().getStart() || line.getEnd() == rollBack.getLast().getEnd()) {
+			
+		}
 	}
 	
 }
