@@ -1,6 +1,7 @@
 package program;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DrawnLine {
@@ -48,15 +49,49 @@ public class DrawnLine {
 		return line.get(line.size() - 1);
 	}
 	
+	//gets elements from the first parameter to the second, including both
+	//to get the entire line, call from 0 to numOfNodes-1
 	public Field[] getElements(int from, int to) {
 		Field[] ret = new Field[to-from+1];
+		int poz = 0;
 		for (; from <= to; ++from) {
-			ret[from] = line.get(from);
+			ret[poz++] = line.get(from);
 		}
 		return ret;
 	}
 	
-	public void connectWith(DrawnLine line) {
+	public void connectWith(DrawnLine otherLine) {
+		
+		if (this.getStart() == otherLine.getStart()) {
+			//don't get the first node of otherLine, because its the last node of this.line
+			Field[] otherLineNodes = otherLine.getElements(1, otherLine.numOfNodes() - 1);
+			Collections.reverse(this.line);
+			for (Field f : otherLineNodes) {
+				this.line.add(f);
+			}
+			
+		} else if (this.getStart() == otherLine.getEnd()) {
+			//don't get the last node of otherLine, for similar reasons
+			Field[] otherLineNodes = otherLine.getElements(0, otherLine.numOfNodes() - 2);
+			Collections.reverse(this.line);
+			for (int i = otherLineNodes.length - 1; i >= 0; --i) {
+				this.line.add(otherLineNodes[i]);
+			}
+			
+		} else if (this.getEnd() == otherLine.getStart()) {
+			
+			Field[] otherLineNodes = otherLine.getElements(1, otherLine.numOfNodes() - 1);
+			for (Field f : otherLineNodes) {
+				this.line.add(f);
+			}
+		
+		} else if (this.getEnd() == otherLine.getEnd()) {
+			
+			Field[] otherLineNodes = otherLine.getElements(0, otherLine.numOfNodes() - 2);
+			for (int i = otherLineNodes.length - 1; i >= 0; --i) {
+				this.line.add(otherLineNodes[i]);
+			}
+		}
 		
 	}
 		

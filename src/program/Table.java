@@ -10,7 +10,7 @@ public class Table {
 	
 	public DrawnLine line;
 	
-	private LineRollBack rollBack;
+	public LineRollBack rollBack;
 	
 	//tested, works fine.
 	//parses a file, and initializes fields[][] based on it
@@ -51,7 +51,6 @@ public class Table {
 			ioe.printStackTrace();
 		}
 		line = null;
-		rollBack.push(line);
 		//if loading user saved table
 	}
 	
@@ -62,30 +61,65 @@ public class Table {
 	
 	//called on mouse press
 	public void startLine(Field startNode) {
-		//need to handle some stuff here based on specification
-		//if there is no previous line make a new line. 
-		//If there is, write to rollback
-		if (line != null) 
+		//if there is a previous line and it's a cycle, or the new one doesn't start on 
+		//the previous one's end point, drawing is blocked
+		if (line != null && line.isStartNode(line.getEnd())) {
+			System.out.println("Drawing is blocked. Remove cycle.");
+		} else if (line != null && line.contains(startNode) && !line.isStartNode(startNode) && !line.isEndNode(startNode)) {
+			System.out.println("Drawing is blocked. Can't start in the middle of another line.");
+		} else {
 			rollBack.push(line);
-		line = new DrawnLine(startNode);
+			line = new DrawnLine(startNode);
+		}
 	}
 	
 	//called on mouse drag
 	public void addLinePiece(Field nextNode) {
-		//need to handle stuff here too
-		if (line.contains(nextNode)) {
+		//in this case, we have a cycle, and we need to finish it by adding the last node
+		if (line.isStartNode(nextNode) && line.numOfNodes() > 2) {
 			//stop drawing mode here
+			line.addNode(nextNode);
 			endLine();
+		//we need to end the line if it ends up back in itself (not at its start node)
+		} else if (line.contains(nextNode)) {
+			endLine();
+		//in this case, we might have a cycle, if we combine the two lines
+		} else if (rollBack.getLast() != null && rollBack.getLast().contains(nextNode)) {
+			//stop drawing mode here
+			
+			//in this case we can connect the two lines, as the new one ends in one of the old one's end points
+			if (rollBack.getLast().isEndNode(nextNode) || rollBack.getLast().isStartNode(nextNode))
+				line.addNode(nextNode);
+			//then end the line, as it has run into the previous one
+			endLine(); 
+			
+		//in any other case, add a node
+		} else {
+			line.addNode(nextNode);
 		}
-		line.addNode(nextNode);
+		
 	}
 	
 	//called on mouse release
 	public void endLine() {
-		if (line.getStart() == rollBack.getLast().getStart() || line.getStart() == rollBack.getLast().getEnd() ||
-			line.getEnd() == rollBack.getLast().getStart() || line.getEnd() == rollBack.getLast().getEnd()) {
-			
-		}
+		//check for a cycle
+		if (line.getStart() == line.getEnd() && line.numOfNodes() > 2) {
+			System.out.println("It's a cycle!!");
+			//check if win
+		} else {
+			//if there's no cycle, but there are two lines, try to connect them
+			if (rollBack.getLast() != null) {
+				//check if the two lines need to be connected (if their endpoints are the same)
+				if (line.getStart() == rollBack.getLast().getStart() || line.getStart() == rollBack.getLast().getEnd() ||
+						line.getEnd() == rollBack.getLast().getStart() || line.getEnd() == rollBack.getLast().getEnd()) {
+					line.connectWith(rollBack.getLast());
+					//after connecting, check again, if now there is a cycle
+					if (line.getStart() == line.getEnd() && line.numOfNodes() > 2) {
+						System.out.println("It's a cycle!!");
+						//check if win
+					}
+				}
+			}
+		} 
 	}
-	
 }
