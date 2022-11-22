@@ -1,6 +1,5 @@
 package program;
 
-import java.util.List;
 import java.util.Scanner;
 import java.io.*;
 
@@ -8,9 +7,9 @@ public class Table {
 	
 	private Field fields[][];
 	
-	public DrawnLine line;
+	private DrawnLine line;
 	
-	public LineRollBack rollBack;
+	private LineRollBack rollBack;
 	
 	//tested, works fine.
 	//parses a file, and initializes fields[][] based on it
@@ -41,6 +40,12 @@ public class Table {
 		sc.close();
 	}
 	
+	public Table() {
+		fields = null;
+		line = null;
+		rollBack = null;
+	}
+	
 	//constructor
 	public Table(String filename) {	
 		rollBack = new LineRollBack(5);
@@ -52,6 +57,14 @@ public class Table {
 		}
 		line = null;
 		//if loading user saved table
+	}
+	
+	public int getWidth() {
+		return fields[0].length;
+	}
+	
+	public int getHeight() {
+		return fields.length;
 	}
 	
 	//returns the Field at the given positions

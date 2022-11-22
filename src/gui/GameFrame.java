@@ -5,6 +5,9 @@ import java.awt.event.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import program.Table;
+
 import java.io.*;
 
 public class GameFrame extends JFrame{
@@ -125,7 +128,149 @@ public class GameFrame extends JFrame{
 	}
 	
 	public void chooseLevelSetup() {
+		contentPane.removeAll();
+		contentPane.repaint();
+		contentPane.revalidate();
 		
+		contentPane.setLayout(new GridBagLayout());
+		
+		GridBagConstraints backButtonConstraint = new GridBagConstraints();
+		backButtonConstraint.gridx = 3;
+		backButtonConstraint.gridy = 3;
+		backButtonConstraint.ipady = 50;
+		backButtonConstraint.fill = GridBagConstraints.HORIZONTAL;
+		backButtonConstraint.insets = new Insets(0, 20, 0, 20);
+		JButton backButton = new JButton("Back");
+		backButton.setFont(new Font("Rockwell", Font.PLAIN, 40));
+		backButton.setBackground(new Color(193, 158, 158));
+		contentPane.add(backButton, backButtonConstraint);
+		
+		JTextArea[] texts = new JTextArea[3];
+		for (int y = 0; y < 3; ++y) {
+			GridBagConstraints textConstraint = new GridBagConstraints();
+			textConstraint.gridx = 0;
+			textConstraint.gridy = y;
+			textConstraint.ipadx = 200;
+			textConstraint.ipady = 150;
+			textConstraint.anchor = GridBagConstraints.PAGE_END;
+			textConstraint.insets = new Insets(100, 0, 0, 0);
+			switch (y) {
+			case 0: texts[y] = new JTextArea("Easy:"); break;
+			case 1: texts[y] = new JTextArea("Medium:"); break;
+			case 2: texts[y] = new JTextArea("Hard:"); break;
+			}
+			texts[y].setEditable(false);
+			texts[y].setOpaque(false);
+			texts[y].setFont(new Font("Rockwell", Font.PLAIN, 40));
+			texts[y].setForeground(new Color(255, 255, 255));
+			contentPane.add(texts[y], textConstraint);
+		}
+		
+		JButton[][] buttons = new JButton[3][3];
+		for (int y = 0; y < 3; ++y) {
+			for (int x = 0; x < 3; ++x) {
+				int level = y*3 + x+1;
+				GridBagConstraints buttonConstraint = new GridBagConstraints();
+				buttonConstraint.gridx = x + 1;
+				buttonConstraint.gridy = y;
+				buttonConstraint.ipadx = 200;
+				buttonConstraint.ipady = 100;
+				buttonConstraint.insets = new Insets(0, 20, 50, 20);
+				buttons[x][y] = new JButton("Level " + level);
+				buttons[x][y].setBackground(new Color(193, 158, 158));
+				buttons[x][y].setFont(new Font("Rockwell", Font.PLAIN, 40));
+				contentPane.add(buttons[x][y], buttonConstraint);
+				
+				buttons[x][y].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+						gameSetup(level);
+					}
+				});
+			}
+		}
+		
+		backButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				mainMenuSetup();
+			}
+		});
+		
+	}
+	
+	public void gameSetup(int level) throws IllegalArgumentException {
+		contentPane.removeAll();
+		contentPane.repaint();
+		contentPane.revalidate();
+		contentPane.setLayout(new BorderLayout());
+		
+		setupNonTableButtons();
+		
+		JPanel centerPanel = new JPanel();
+		contentPane.add(centerPanel, BorderLayout.CENTER);
+		centerPanel.setLayout(new GridBagLayout());
+		centerPanel.setOpaque(false);
+		
+		
+		
+		//empty table until 'initialized'
+		Table t = new Table();
+		switch (level) {
+		case 1: t = new Table("gamesave1.dat"); break;
+		case 2: break;
+		case 3: break;
+		case 4: break;
+		case 5: break;
+		case 6: break;
+		case 7: break;
+		case 8: break;
+		case 9: break;
+		default: throw new IllegalArgumentException("Not a level from 1-9");
+		}
+		
+		int x = t.getWidth();
+		int y = t.getHeight();
+		
+		JButton[][] buttons = new JButton[x][y];
+		for (int j = 0; j < y; ++j) {
+			for (int i = 0; i < x; ++i) {
+				GridBagConstraints buttonConstraint = new GridBagConstraints();
+				buttonConstraint.gridx = i;
+				buttonConstraint.gridy = j;
+				buttonConstraint.ipadx = 50;
+				buttonConstraint.ipady = 50;
+				buttons[i][j] = new JButton(i + ", " + j);
+				centerPanel.add(buttons[i][j], buttonConstraint);
+			}
+		}
+		
+	}
+	
+	
+	private void setupNonTableButtons() {
+		JPanel southPanel = new JPanel();
+		contentPane.add(southPanel, BorderLayout.SOUTH);
+		southPanel.setLayout(new GridBagLayout());
+		JButton undo = new JButton("Undo");
+		JButton back = new JButton("Back");
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.ipadx = 70;
+		constraints.ipady = 70;
+		constraints.insets = new Insets(0, 250, 50, 250);
+		constraints.anchor = GridBagConstraints.WEST;
+		southPanel.add(undo, constraints);
+		constraints.anchor = GridBagConstraints.EAST;
+		constraints.ipadx = 200;
+		constraints.ipady = 50;
+		southPanel.add(back, constraints);
+		southPanel.setOpaque(false);
+		back.setFont(new Font("Rockwell", Font.PLAIN, 40));
+		back.setBackground(new Color(193, 158, 158));
+		
+		back.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				chooseLevelSetup();
+			}
+		});
 	}
 		
 }

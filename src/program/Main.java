@@ -22,12 +22,14 @@ public class Main {
 			e.printStackTrace();
 		}
 		*/
-		/*
+		
 		GameFrame frame = new GameFrame();
 		frame.setVisible(true);
-		*/
-		Table t = new Table("gamesave1.dat");
 		
+		
+		Table t = new Table("gamesave1.dat");
+		System.out.println(t.getHeight() + "\n" + t.getWidth());
+		/*
 		t.startLine(t.getFieldAt(0, 2));
 		t.addLinePiece(t.getFieldAt(0, 1));
 		t.addLinePiece(t.getFieldAt(0, 0));
@@ -39,12 +41,7 @@ public class Main {
 		t.startLine(t.getFieldAt(3, 0));
 		t.addLinePiece(t.getFieldAt(2, 0));
 		t.addLinePiece(t.getFieldAt(1, 0));
-		
-		
-		
-		
-		
-		/*
+	
 		//set line back to private once done testing
 		Field[] f = t.line.getElements(0, t.line.numOfNodes()-1);
 		for (Field asd : f) {
@@ -57,11 +54,11 @@ public class Main {
 		t.addLinePiece(t.getFieldAt(1, 1));
 		
 		t.line.connectWith(t.rollBack.getLast());
-		*/
+		
 		Field[] f = t.line.getElements(0, t.line.numOfNodes()-1);
 		for (Field asd : f) {
 			System.out.println(asd.toString());
 		}
-		
+		*/
 	}
 }
