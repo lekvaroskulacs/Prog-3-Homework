@@ -8,21 +8,29 @@ public class DrawnLine {
 
 	private List<Field> line;
 	
+	private boolean finished;
+	
 	public DrawnLine() {
 		line = new ArrayList<Field>();
+		finished = false;
 	}
 	
 	public DrawnLine(Field startNode) {
 		line = new ArrayList<Field>();
 		line.add(startNode);
+		finished = false;
 	}
 	
 	public int numOfNodes() {
 		return line.size();
 	}
 	
-	public int numOfEdges() {
-		return line.size()-1;
+	public boolean getFinished() {
+		return finished;
+	}
+	
+	public void setFinished(boolean fin) {
+		finished = fin;
 	}
 	
 	public void addNode(Field nextNode) {

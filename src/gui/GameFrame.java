@@ -230,19 +230,20 @@ public class GameFrame extends JFrame{
 		int x = t.getWidth();
 		int y = t.getHeight();
 		
-		JButton[][] buttons = new JButton[x][y];
+		TablePanel[][] panels = new TablePanel[x][y];
 		for (int j = 0; j < y; ++j) {
 			for (int i = 0; i < x; ++i) {
-				GridBagConstraints buttonConstraint = new GridBagConstraints();
-				buttonConstraint.gridx = i;
-				buttonConstraint.gridy = j;
-				buttonConstraint.ipadx = 50;
-				buttonConstraint.ipady = 50;
-				buttons[i][j] = new JButton(i + ", " + j);
-				centerPanel.add(buttons[i][j], buttonConstraint);
+				GridBagConstraints panelConstraint = new GridBagConstraints();
+				panelConstraint.gridx = i;
+				panelConstraint.gridy = j;
+				panelConstraint.ipadx = 100;
+				panelConstraint.ipady = 100;
+				panels[i][j] = t.getFieldAt(i, j).getPanel();
+				panels[i][j].addMouseListener(new InGameMouseInputListener());
+				panels[i][j].addMouseMotionListener(new InGameMouseInputListener());
+				centerPanel.add(panels[i][j], panelConstraint);
 			}
 		}
-		
 	}
 	
 	

@@ -26,9 +26,6 @@ public class Main {
 		GameFrame frame = new GameFrame();
 		frame.setVisible(true);
 		
-		
-		Table t = new Table("gamesave1.dat");
-		System.out.println(t.getHeight() + "\n" + t.getWidth());
 		/*
 		t.startLine(t.getFieldAt(0, 2));
 		t.addLinePiece(t.getFieldAt(0, 1));

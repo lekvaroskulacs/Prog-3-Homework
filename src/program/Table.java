@@ -34,6 +34,8 @@ public class Table {
 					fields[i][j] = new BlackPearl(this);
 				else if (c == 'w')
 					fields[i][j] = new WhitePearl(this);
+				fields[i][j].setX(i);
+				fields[i][j].setY(j);
 			}
 		}
 		
@@ -59,6 +61,10 @@ public class Table {
 		//if loading user saved table
 	}
 	
+	public DrawnLine getLine() {
+		return line;
+	}
+	
 	public int getWidth() {
 		return fields[0].length;
 	}
@@ -76,7 +82,7 @@ public class Table {
 	public void startLine(Field startNode) {
 		//if there is a previous line and it's a cycle, or the new one doesn't start on 
 		//the previous one's end point, drawing is blocked
-		if (line != null && line.isStartNode(line.getEnd())) {
+		if (line != null && line.isStartNode(line.getEnd()) && line.numOfNodes() != 1) {
 			System.out.println("Drawing is blocked. Remove cycle.");
 		} else if (line != null && line.contains(startNode) && !line.isStartNode(startNode) && !line.isEndNode(startNode)) {
 			System.out.println("Drawing is blocked. Can't start in the middle of another line.");
@@ -86,35 +92,44 @@ public class Table {
 		}
 	}
 	
-	//called on mouse drag
-	public void addLinePiece(Field nextNode) {
-		//in this case, we have a cycle, and we need to finish it by adding the last node
-		if (line.isStartNode(nextNode) && line.numOfNodes() > 2) {
-			//stop drawing mode here
-			line.addNode(nextNode);
-			endLine();
-		//we need to end the line if it ends up back in itself (not at its start node)
-		} else if (line.contains(nextNode)) {
-			endLine();
-		//in this case, we might have a cycle, if we combine the two lines
-		} else if (rollBack.getLast() != null && rollBack.getLast().contains(nextNode)) {
-			//stop drawing mode here
-			
-			//in this case we can connect the two lines, as the new one ends in one of the old one's end points
-			if (rollBack.getLast().isEndNode(nextNode) || rollBack.getLast().isStartNode(nextNode))
+	//called on mouse drag, returns false if line was ended while the function ran
+	public boolean addLinePiece(Field nextNode) {
+		//only add node if the new one is a neighbor of the last (check legality of argument)
+		if (line != null && nextNode.isNeighbor(line.getEnd())) {
+			//in this case, we have a cycle, and we need to finish it by adding the last node
+			if (line.isStartNode(nextNode) && line.numOfNodes() > 2) {
 				line.addNode(nextNode);
-			//then end the line, as it has run into the previous one
-			endLine(); 
-			
-		//in any other case, add a node
+				endLine();
+				return false;
+			//we need to end the line if it ends up back in itself (not at its start node)
+			} else if (line.contains(nextNode)) {
+				endLine();
+				return false;
+			//in this case, we might have a cycle, if we combine the two lines
+			} else if (rollBack.getLast() != null && rollBack.getLast().contains(nextNode)) {
+				//in this case we can connect the two lines, as the new one ends in one of the old one's end points
+				if (rollBack.getLast().isEndNode(nextNode) || rollBack.getLast().isStartNode(nextNode))
+					line.addNode(nextNode);
+				//then end the line, as it has run into the previous one
+				endLine(); 
+				return false;
+			//in any other case, add a node (except if the line is finished)
+			} else {
+				if (!line.getFinished())
+					line.addNode(nextNode);
+				return true;
+			}
 		} else {
-			line.addNode(nextNode);
+			//the argument was illegal (but no line was ended)
+			return true;
 		}
 		
 	}
 	
 	//called on mouse release
 	public void endLine() {
+		//finish line
+		line.setFinished(true);
 		//check for a cycle
 		if (line.getStart() == line.getEnd() && line.numOfNodes() > 2) {
 			System.out.println("It's a cycle!!");
