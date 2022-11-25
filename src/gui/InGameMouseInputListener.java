@@ -37,15 +37,19 @@ public class InGameMouseInputListener implements MouseListener, MouseMotionListe
 		TablePanel eventPanel = (TablePanel) e.getComponent();
 		Field startNode = eventPanel.getField();
 		startNode.getTable().startLine(startNode);
-		
+		eventPanel.getTopLevelAncestor().repaint();
+		eventPanel.repaint();
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 	
 		TablePanel eventPanel = (TablePanel) e.getComponent();
-		eventPanel.getField().getTable().endLine();
+		if (!drawingBlocked)
+			eventPanel.getField().getTable().endLine();
 		drawingBlocked = false;
+		eventPanel.getTopLevelAncestor().repaint();
+		eventPanel.repaint();
 
 	}
 
@@ -58,6 +62,7 @@ public class InGameMouseInputListener implements MouseListener, MouseMotionListe
 			if (!nextNode.getTable().addLinePiece(nextNode)) {
 				drawingBlocked = true;
 			}
+			eventPanel.getTopLevelAncestor().repaint();
 		}
 	}
 

@@ -34,8 +34,8 @@ public class Table {
 					fields[i][j] = new BlackPearl(this);
 				else if (c == 'w')
 					fields[i][j] = new WhitePearl(this);
-				fields[i][j].setX(i);
-				fields[i][j].setY(j);
+				fields[i][j].setX(j);
+				fields[i][j].setY(i);
 			}
 		}
 		
@@ -59,6 +59,10 @@ public class Table {
 		}
 		line = null;
 		//if loading user saved table
+	}
+	
+	public LineRollBack getRollBack() {
+		return rollBack;
 	}
 	
 	public DrawnLine getLine() {
@@ -88,7 +92,20 @@ public class Table {
 			System.out.println("Drawing is blocked. Can't start in the middle of another line.");
 		} else {
 			rollBack.push(line);
+			//only want to keep the 2 latest lines 
+			if (rollBack.read(rollBack.size()-2)!= null) {
+				Field[] nodes = rollBack.read(rollBack.size()-2).getElements(0, rollBack.read(rollBack.size()-2).numOfNodes()-1);
+				for (Field n : nodes)  {
+					if (!line.contains(n)) {
+						n.setHasLine(false);
+						n.setLine(null);
+					}
+				}
+			}
 			line = new DrawnLine(startNode);
+			startNode.setHasLine(true);
+			startNode.setLine(line);
+			
 		}
 	}
 	
@@ -96,9 +113,17 @@ public class Table {
 	public boolean addLinePiece(Field nextNode) {
 		//only add node if the new one is a neighbor of the last (check legality of argument)
 		if (line != null && nextNode.isNeighbor(line.getEnd())) {
+			//this is only possible if the user moves the cursor fast enough, that it
+			//registers at a diagonal field as the next node. just end the line here
+			if (nextNode.isDiagonal(line.getEnd())) {
+				endLine();
+				return false;
+			}
 			//in this case, we have a cycle, and we need to finish it by adding the last node
 			if (line.isStartNode(nextNode) && line.numOfNodes() > 2) {
 				line.addNode(nextNode);
+				nextNode.setHasLine(true);
+				nextNode.setLine(line);
 				endLine();
 				return false;
 			//we need to end the line if it ends up back in itself (not at its start node)
@@ -106,17 +131,23 @@ public class Table {
 				endLine();
 				return false;
 			//in this case, we might have a cycle, if we combine the two lines
-			} else if (rollBack.getLast() != null && rollBack.getLast().contains(nextNode)) {
+			} else if (rollBack.read(rollBack.size()-1) != null && rollBack.read(rollBack.size()-1).contains(nextNode)) {
 				//in this case we can connect the two lines, as the new one ends in one of the old one's end points
-				if (rollBack.getLast().isEndNode(nextNode) || rollBack.getLast().isStartNode(nextNode))
+				if (rollBack.read(rollBack.size()-1).isEndNode(nextNode) || rollBack.read(rollBack.size()-1).isStartNode(nextNode)) {
 					line.addNode(nextNode);
+					nextNode.setHasLine(true);
+					nextNode.setLine(line);
+				}
 				//then end the line, as it has run into the previous one
 				endLine(); 
 				return false;
 			//in any other case, add a node (except if the line is finished)
 			} else {
-				if (!line.getFinished())
+				if (!line.getFinished()) {
 					line.addNode(nextNode);
+					nextNode.setHasLine(true);
+					nextNode.setLine(line);
+				}
 				return true;
 			}
 		} else {
@@ -136,15 +167,27 @@ public class Table {
 			//check if win
 		} else {
 			//if there's no cycle, but there are two lines, try to connect them
-			if (rollBack.getLast() != null) {
+			if (rollBack.read(rollBack.size()-1) != null) {
 				//check if the two lines need to be connected (if their endpoints are the same)
-				if (line.getStart() == rollBack.getLast().getStart() || line.getStart() == rollBack.getLast().getEnd() ||
-						line.getEnd() == rollBack.getLast().getStart() || line.getEnd() == rollBack.getLast().getEnd()) {
-					line.connectWith(rollBack.getLast());
+				if (line.getStart() == rollBack.read(rollBack.size()-1).getStart() || line.getStart() == rollBack.read(rollBack.size()-1).getEnd() ||
+						line.getEnd() == rollBack.read(rollBack.size()-1).getStart() || line.getEnd() == rollBack.read(rollBack.size()-1).getEnd()) {
+					line.connectWith(rollBack.read(rollBack.size()-1));
 					//after connecting, check again, if now there is a cycle
 					if (line.getStart() == line.getEnd() && line.numOfNodes() > 2) {
 						System.out.println("It's a cycle!!");
 						//check if win
+					}
+				//the lines end points are not the same
+				} else {
+					//remove previous line
+					if (rollBack.read(rollBack.size()-1)!= null) {
+						Field[] nodes = rollBack.read(rollBack.size()-1).getElements(0, rollBack.read(rollBack.size()-1).numOfNodes()-1);
+						for (Field n : nodes)  {
+							if (!line.contains(n)) {
+								n.setHasLine(false);
+								n.setLine(null);
+							}
+						}
 					}
 				}
 			}

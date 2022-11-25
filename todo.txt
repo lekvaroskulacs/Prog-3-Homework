@@ -1,0 +1,6 @@
+- win condition check
+- line delete
+- line undo
+- serialization
+- how to
+- aesthetic upgrade

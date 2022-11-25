@@ -1,7 +1,6 @@
 package gui;
 
 import java.awt.*;
-
 import program.Field;
 import program.Table;
 
@@ -23,5 +22,7 @@ public class WhitePearlPanel extends TablePanel {
 		
 		g.setColor(Color.BLACK);
 		g.drawOval(10, 10, getWidth() - 21, getHeight() - 21);
+		
+		paintLine(g);
 	}
 }

@@ -57,6 +57,18 @@ public class DrawnLine {
 		return line.get(line.size() - 1);
 	}
 	
+	//returns null if out of bounds
+	public Field getElementAt(int i) {
+		if (i >= line.size() || i < 0)
+			return null;
+		else
+			return line.get(i);
+	}
+	
+	public int getNodeIndex(Field f) {
+		return line.indexOf(f);
+	}
+	
 	//gets elements from the first parameter to the second, including both
 	//to get the entire line, call from 0 to numOfNodes-1
 	public Field[] getElements(int from, int to) {

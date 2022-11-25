@@ -19,6 +19,10 @@ public class LineRollBack {
 		this.maxSize = maxSize;
 	}
 	
+	public int size() {
+		return rollBack.size();
+	}
+	
 	public void push(DrawnLine t) {
 		if (rollBack.size() < maxSize) {
 			rollBack.add(t);
@@ -35,9 +39,15 @@ public class LineRollBack {
 			return rollBack.remove(rollBack.size() - 1);
 	}
 	
-	//read the last added element 
-	public DrawnLine getLast() {
-		return rollBack.get(rollBack.size() - 1);
+	//read the given element without deleting it
+	public DrawnLine read(int i) {
+		if (i < 0 || i > size())
+			return null;
+		return rollBack.get(i);
+	}
+	
+	public int indexOf(DrawnLine l) {
+		return rollBack.indexOf(l);
 	}
 	
 }

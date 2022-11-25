@@ -2,6 +2,7 @@ package program;
 
 import gui.*;
 
+
 /**
  * Also functions as a node in the graph of the drawn line.
  */
@@ -13,6 +14,10 @@ abstract public class Field {
 	
 	protected Table table;
 	
+	protected DrawnLine line = null;
+	
+	protected boolean hasLine = false;
+	
 	//the graphical panel which corresponds to the field
 	protected TablePanel panel; 
 	
@@ -22,6 +27,22 @@ abstract public class Field {
 	
 	public Table getTable() {
 		return table;
+	}
+	
+	public DrawnLine getLine() {
+		return line;
+	}
+	
+	public void setLine(DrawnLine l) {
+		line = l;
+	}
+	
+	public boolean hasLine() {
+		return hasLine;
+	}
+	
+	public void setHasLine(boolean b) {
+		hasLine = b;
 	}
 	
 	public int getX() {
@@ -49,6 +70,27 @@ abstract public class Field {
 		if (f.getX() == x && f.getY() == y)
 			ret = false;
 		return ret;
+	}
+	
+	public boolean isDiagonal(Field f) {
+		boolean ret = false;
+		//if both their coordinates are one apart
+		if (Math.abs(f.getX() - x) == 1 && Math.abs(f.getY() - y) == 1)
+			ret = true;
+		return ret;
+	}
+	
+	public Direction directionOfNeighbor(Field f) throws IllegalArgumentException {
+		if (!isNeighbor(f))
+			throw new IllegalArgumentException();
+		if (x < f.getX()) 
+			return Direction.east;
+		else if (x > f.getX())
+			return Direction.west;
+		else if (y < f.getY()) 
+			return Direction.south;
+		else 
+			return Direction.north;
 	}
 	
 	/**
