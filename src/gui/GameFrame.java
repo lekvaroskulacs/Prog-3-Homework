@@ -30,6 +30,7 @@ public class GameFrame extends JFrame{
 		contentPane.removeAll();
 		contentPane.repaint();
 		contentPane.revalidate();
+		this.setJMenuBar(null);
 		
 		Image backgroundImage;
 		try {
@@ -99,7 +100,7 @@ public class GameFrame extends JFrame{
 		contentPane.removeAll();
 		contentPane.repaint();
 		contentPane.revalidate();
-		//Amugy gridbaglayouttal kene, majd a leirast egy nagyobb jscrollpane-be belebaszni
+		this.setJMenuBar(null);
 		contentPane.setLayout(new GridLayout(4, 4, 0, 0));
 		JPanel[][] panelHolder = new JPanel[4][6];
 		
@@ -131,6 +132,7 @@ public class GameFrame extends JFrame{
 		contentPane.removeAll();
 		contentPane.repaint();
 		contentPane.revalidate();
+		this.setJMenuBar(null);
 		
 		contentPane.setLayout(new GridBagLayout());
 		
@@ -202,13 +204,12 @@ public class GameFrame extends JFrame{
 		contentPane.repaint();
 		contentPane.revalidate();
 		contentPane.setLayout(new BorderLayout());
-		
+		//set the layout
 		JPanel centerPanel = new JPanel();
 		contentPane.add(centerPanel, BorderLayout.CENTER);
 		centerPanel.setLayout(new GridBagLayout());
 		centerPanel.setOpaque(false);
-		
-		//empty table until 'initialized'
+		//initialize table
 		Table t = new Table();
 		switch (level) {
 		case 1: t = new Table("gamesave1.dat"); break;
@@ -222,9 +223,27 @@ public class GameFrame extends JFrame{
 		case 9: break;
 		default: throw new IllegalArgumentException("Not a level from 1-9");
 		}
-		
-		setupNonTableButtons(t);
-		
+		//Jmenu
+		JMenuSetup(t);
+		//Back button
+		JPanel southPanel = new JPanel();
+		contentPane.add(southPanel, BorderLayout.SOUTH);
+		southPanel.setLayout(new GridBagLayout());
+		JButton back = new JButton("Back");
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.anchor = GridBagConstraints.EAST;
+		constraints.ipadx = 200;
+		constraints.ipady = 50;
+		southPanel.add(back, constraints);
+		southPanel.setOpaque(false);
+		back.setFont(new Font("Rockwell", Font.PLAIN, 40));
+		back.setBackground(new Color(193, 158, 158));
+		back.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				chooseLevelSetup();
+			}
+		});
+		//game table panels 
 		int x = t.getWidth();
 		int y = t.getHeight();
 		
@@ -244,49 +263,31 @@ public class GameFrame extends JFrame{
 		}
 	}
 	
-	
-	private void setupNonTableButtons(Table t) {
-		JPanel southPanel = new JPanel();
-		contentPane.add(southPanel, BorderLayout.SOUTH);
-		southPanel.setLayout(new GridBagLayout());
-		JButton undo = new JButton("Undo");
-		JButton back = new JButton("Back");
-		JButton delete = new JButton("Delete");
-		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.ipadx = 70;
-		constraints.ipady = 70;
-		constraints.insets = new Insets(0, 250, 50, 250);
-		constraints.anchor = GridBagConstraints.WEST;
-		southPanel.add(delete, constraints);
-		southPanel.add(undo, constraints);
-		constraints.anchor = GridBagConstraints.EAST;
-		constraints.ipadx = 200;
-		constraints.ipady = 50;
-		southPanel.add(back, constraints);
-		southPanel.setOpaque(false);
-		back.setFont(new Font("Rockwell", Font.PLAIN, 40));
-		back.setBackground(new Color(193, 158, 158));
+	private void JMenuSetup(Table t) {
+		//add JMenu
+		JMenuBar menuBar = new JMenuBar();
+		JMenu options = new JMenu("Options");
+		JMenuItem save = new JMenuItem("Save");
+		JMenuItem delete = new JMenuItem("Delete");
+		JMenuItem undo = new JMenuItem("Undo");
+		options.add(save);
+		options.add(delete);
+		options.add(undo);
+		menuBar.add(options);
+		this.setJMenuBar(menuBar);
 		
-		
-		back.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				chooseLevelSetup();
-			}
-		});
-		
+		//JMenu actionListeners
 		undo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				t.undo();
-				undo.getTopLevelAncestor().repaint();
+				repaint();
 			}
 		});
-		
 		delete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				t.deleteLine();
-				undo.getTopLevelAncestor().repaint();
+				repaint();
 			}
 		});
-	}
-		
+	}		
 }
