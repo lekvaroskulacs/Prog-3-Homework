@@ -97,6 +97,9 @@ abstract public class Field {
 	 * Checks if the line passes through the node correctly
 	 * @return
 	 */
-	abstract public boolean passThroughCheck();
+	abstract public boolean winConditionCheck(Field prevNode, Field nextNode);
+	
+	//checks if the given field is a pearl, and if it is, is it in the cycle
+	abstract public boolean pearlInCycle();
 
 }

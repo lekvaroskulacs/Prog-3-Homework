@@ -164,7 +164,18 @@ public class Table {
 		//check for a cycle
 		if (line.getStart() == line.getEnd() && line.numOfNodes() > 2) {
 			System.out.println("It's a cycle!!");
+			if (rollBack.read(rollBack.size()-1)!= null) {
+				Field[] nodes = rollBack.read(rollBack.size()-1).getElements(0, rollBack.read(rollBack.size()-1).numOfNodes()-1);
+				for (Field n : nodes)  {
+					if (!line.contains(n)) {
+						n.setHasLine(false);
+						n.setLine(null);
+					}
+				}
+			}
 			//check if win
+			boolean win = checkWin();
+			if (win) System.out.println("Victory!");
 		} else {
 			//if there's no cycle, but there are two lines, try to connect them
 			if (rollBack.read(rollBack.size()-1) != null) {
@@ -176,6 +187,8 @@ public class Table {
 					if (line.getStart() == line.getEnd() && line.numOfNodes() > 2) {
 						System.out.println("It's a cycle!!");
 						//check if win
+						boolean win = checkWin();
+						if (win) System.out.println("Victory!");
 					}
 				//the lines end points are not the same
 				} else {
@@ -192,5 +205,68 @@ public class Table {
 				}
 			}
 		} 
+	}
+	
+	//only call if a cycle is guaranteed
+	public boolean checkWin() {
+		boolean win = true;
+		Field[] nodes = line.getElements(0, line.numOfNodes()-1);
+		for (int j = 0; j < getHeight(); ++j)
+			for (int i = 0; i < getWidth(); ++i) {
+				if (!getFieldAt(i,j).pearlInCycle())
+					return false;
+			}
+		for (Field n : nodes) {
+			Field prevNode =  line.getElementAt(line.getNodeIndex(n)-1);
+			Field nextNode = line.getElementAt(line.getNodeIndex(n)+1);
+			//because we're guaranteed a cycle
+			if (prevNode == null) prevNode = line.getEnd();
+			if (nextNode == null) nextNode = line.getStart();
+			win = n.winConditionCheck(prevNode, nextNode);
+			if (win == false)
+				break;
+		}
+		return win;
+	}
+	
+	public void undo() {
+		//invalidate current line
+		if (line != null) {
+			Field[] nodes = line.getElements(0, line.numOfNodes()-1);
+			for (int i = 0; i < line.numOfNodes(); ++i) {
+				nodes[i].setHasLine(false);
+				nodes[i].setLine(null);
+			}
+		}
+		line = rollBack.pop();
+		lineRevalidate();
+	}
+	
+	public void deleteLine() {
+		rollBack.push(line);
+		line = null;
+		lineRevalidate();
+	}
+	
+	public void lineRevalidate() {
+		//if line is not null, validate the current line
+		if (line != null) {
+			Field[] nodes = line.getElements(0, line.numOfNodes()-1);
+			for (int i = 0; i < line.numOfNodes(); ++i) {
+				nodes[i].setHasLine(true);
+				nodes[i].setLine(line);
+			}
+		}
+		//then invalidate the previous line, if not null, and it isn't part of the current line
+		DrawnLine prevLine = rollBack.read(rollBack.size()-1);
+		if (prevLine != null) {
+			Field[] prevLineNodes = prevLine.getElements(0, prevLine.numOfNodes()-1);
+			for (int i = 0; i < prevLine.numOfNodes(); ++i) {
+				if (line != null &&!line.contains(prevLineNodes[i]) || line == null) {	
+					prevLineNodes[i].setHasLine(false);
+					prevLineNodes[i].setLine(null);
+				}
+			}
+		}
 	}
 }

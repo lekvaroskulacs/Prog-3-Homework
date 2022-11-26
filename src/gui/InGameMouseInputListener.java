@@ -63,6 +63,7 @@ public class InGameMouseInputListener implements MouseListener, MouseMotionListe
 				drawingBlocked = true;
 			}
 			eventPanel.getTopLevelAncestor().repaint();
+			eventPanel.repaint();
 		}
 	}
 
@@ -70,5 +71,4 @@ public class InGameMouseInputListener implements MouseListener, MouseMotionListe
 	public void mouseExited(MouseEvent e) {
 		
 	}
-
 }

@@ -9,12 +9,17 @@ public class BlankField extends Field {
 		panel = new EmptyPanel(this);
 	}
 	
-	public boolean passThroughCheck() {
+	public boolean winConditionCheck(Field prevNode, Field nextNode) {
 		return true;
 	}
 	
 	public String toString() {
 		return "BlankField";
+	}
+
+	@Override
+	public boolean pearlInCycle() {
+		return true;
 	}
 	
 }

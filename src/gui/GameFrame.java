@@ -137,9 +137,9 @@ public class GameFrame extends JFrame{
 		GridBagConstraints backButtonConstraint = new GridBagConstraints();
 		backButtonConstraint.gridx = 3;
 		backButtonConstraint.gridy = 3;
-		backButtonConstraint.ipady = 50;
+		backButtonConstraint.ipady = 0;
 		backButtonConstraint.fill = GridBagConstraints.HORIZONTAL;
-		backButtonConstraint.insets = new Insets(0, 20, 0, 20);
+		backButtonConstraint.insets = new Insets(0, 20, 30, 20);
 		JButton backButton = new JButton("Back");
 		backButton.setFont(new Font("Rockwell", Font.PLAIN, 40));
 		backButton.setBackground(new Color(193, 158, 158));
@@ -150,8 +150,8 @@ public class GameFrame extends JFrame{
 			GridBagConstraints textConstraint = new GridBagConstraints();
 			textConstraint.gridx = 0;
 			textConstraint.gridy = y;
-			textConstraint.ipadx = 200;
-			textConstraint.ipady = 150;
+			textConstraint.ipadx = 150;
+			textConstraint.ipady = 115;
 			textConstraint.anchor = GridBagConstraints.PAGE_END;
 			textConstraint.insets = new Insets(100, 0, 0, 0);
 			switch (y) {
@@ -173,8 +173,8 @@ public class GameFrame extends JFrame{
 				GridBagConstraints buttonConstraint = new GridBagConstraints();
 				buttonConstraint.gridx = x + 1;
 				buttonConstraint.gridy = y;
-				buttonConstraint.ipadx = 200;
-				buttonConstraint.ipady = 100;
+				buttonConstraint.ipadx = 150;
+				buttonConstraint.ipady = 75;
 				buttonConstraint.insets = new Insets(0, 20, 50, 20);
 				buttons[x][y] = new JButton("Level " + level);
 				buttons[x][y].setBackground(new Color(193, 158, 158));
@@ -203,14 +203,10 @@ public class GameFrame extends JFrame{
 		contentPane.revalidate();
 		contentPane.setLayout(new BorderLayout());
 		
-		setupNonTableButtons();
-		
 		JPanel centerPanel = new JPanel();
 		contentPane.add(centerPanel, BorderLayout.CENTER);
 		centerPanel.setLayout(new GridBagLayout());
 		centerPanel.setOpaque(false);
-		
-		
 		
 		//empty table until 'initialized'
 		Table t = new Table();
@@ -227,6 +223,8 @@ public class GameFrame extends JFrame{
 		default: throw new IllegalArgumentException("Not a level from 1-9");
 		}
 		
+		setupNonTableButtons(t);
+		
 		int x = t.getWidth();
 		int y = t.getHeight();
 		
@@ -236,8 +234,8 @@ public class GameFrame extends JFrame{
 				GridBagConstraints panelConstraint = new GridBagConstraints();
 				panelConstraint.gridx = i;
 				panelConstraint.gridy = j;
-				panelConstraint.ipadx = 100;
-				panelConstraint.ipady = 100;
+				panelConstraint.ipadx = 50;
+				panelConstraint.ipady = 50;
 				panels[i][j] = t.getFieldAt(i, j).getPanel();
 				panels[i][j].addMouseListener(new InGameMouseInputListener());
 				panels[i][j].addMouseMotionListener(new InGameMouseInputListener());
@@ -247,17 +245,19 @@ public class GameFrame extends JFrame{
 	}
 	
 	
-	private void setupNonTableButtons() {
+	private void setupNonTableButtons(Table t) {
 		JPanel southPanel = new JPanel();
 		contentPane.add(southPanel, BorderLayout.SOUTH);
 		southPanel.setLayout(new GridBagLayout());
 		JButton undo = new JButton("Undo");
 		JButton back = new JButton("Back");
+		JButton delete = new JButton("Delete");
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.ipadx = 70;
 		constraints.ipady = 70;
 		constraints.insets = new Insets(0, 250, 50, 250);
 		constraints.anchor = GridBagConstraints.WEST;
+		southPanel.add(delete, constraints);
 		southPanel.add(undo, constraints);
 		constraints.anchor = GridBagConstraints.EAST;
 		constraints.ipadx = 200;
@@ -267,9 +267,24 @@ public class GameFrame extends JFrame{
 		back.setFont(new Font("Rockwell", Font.PLAIN, 40));
 		back.setBackground(new Color(193, 158, 158));
 		
+		
 		back.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				chooseLevelSetup();
+			}
+		});
+		
+		undo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				t.undo();
+				undo.getTopLevelAncestor().repaint();
+			}
+		});
+		
+		delete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				t.deleteLine();
+				undo.getTopLevelAncestor().repaint();
 			}
 		});
 	}

@@ -44,6 +44,7 @@ abstract public class TablePanel extends JPanel {
 			
 			Field previousNode = f.getLine().getElementAt(f.getLine().getNodeIndex(f) - 1);
 			Field nextNode = f.getLine().getElementAt(f.getLine().getNodeIndex(f) + 1);
+			//if there is one node
 			if (f.getLine().numOfNodes() == 1) {
 				//draw circle (line start)
 				g.fillOval(panelWidth/2 - 4 , panelHeight/2 - 4, 8, 8);
@@ -63,15 +64,15 @@ abstract public class TablePanel extends JPanel {
 						}
 					}
 				}
+			//if there are more than 1 nodes
 			} else {
 				if (previousNode == null) {
-					if (f.getLine().isStartNode(f) && f.getLine().isEndNode(f)) {
-						lineDrawHelper(g, f.getLine().getElementAt(f.getLine().numOfNodes()-2));
-					}
-					//if we start at the end of a previous line, then connect them still
 					LineRollBack fRollBack = f.getTable().getRollBack();
 					DrawnLine prevLine = fRollBack.read(fRollBack.size()-1);
-					if (f.getLine().isStartNode(f) &&  prevLine != null) {
+					if (f.getLine().isStartNode(f) && f.getLine().isEndNode(f)) {
+						lineDrawHelper(g, f.getLine().getElementAt(f.getLine().numOfNodes()-2));
+					//if we start at the end of a previous line, then connect them still
+					} else if (f.getLine().isStartNode(f) &&  prevLine != null) {
 						if (prevLine.isEndNode(f)) {
 							int connectedIdx = prevLine.getNodeIndex(f) - 1;
 							lineDrawHelper(g, prevLine.getElementAt(connectedIdx));
@@ -97,5 +98,4 @@ abstract public class TablePanel extends JPanel {
 			}
 		}
 	}
-	
 }
