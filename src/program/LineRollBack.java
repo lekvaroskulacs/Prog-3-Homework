@@ -1,5 +1,6 @@
 package program;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import java.util.List;
  * new elements are still added, but the first (oldest) ones are 
  * removed instead.
  */
-public class LineRollBack {
+public class LineRollBack implements Serializable{
 	
 	private List<DrawnLine> rollBack;
 	

@@ -9,10 +9,12 @@ import program.LineRollBack;
 import program.Table;
 
 import java.awt.*;
+import java.io.Serializable;
+
 import program.Direction;
 import program.DrawnLine;
 
-abstract public class TablePanel extends JPanel {
+abstract public class TablePanel extends JPanel implements Serializable{
 	
 	protected Field f;
 	
@@ -21,6 +23,8 @@ abstract public class TablePanel extends JPanel {
 	}
 	
 	private void lineDrawHelper(Graphics g, Field dir) {
+		if (dir == null)
+			return;
 		int panelWidth = getWidth()-1;
 		int panelHeight = getHeight()-1;
 		if (f.directionOfNeighbor(dir) == Direction.east)

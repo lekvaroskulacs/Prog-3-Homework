@@ -1,34 +1,25 @@
 package gui;
 
-import java.awt.Container;
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
 import javax.swing.*;
 
 import program.Field;
 
 //should only be added to TablePanel
-public class InGameMouseInputListener implements MouseListener, MouseMotionListener {
+public class InGameMouseInputListener implements MouseListener {
+	
+	JFrame f;
+	
+	public InGameMouseInputListener(JFrame f) {
+		this.f = f;
+	}
 	
 	static private boolean drawingBlocked = false;
-	
-	@Override
-	public void mouseDragged(MouseEvent e) {
-
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-
-	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
+		//don't do anything
 	}
 
 	@Override
@@ -36,39 +27,54 @@ public class InGameMouseInputListener implements MouseListener, MouseMotionListe
 
 		TablePanel eventPanel = (TablePanel) e.getComponent();
 		Field startNode = eventPanel.getField();
-		startNode.getTable().startLine(startNode);
-		eventPanel.getTopLevelAncestor().repaint();
-		eventPanel.repaint();
+		String message = startNode.getTable().startLine(startNode);
+		if (message != null)
+			JOptionPane.showMessageDialog(f, 
+					message.substring(message.indexOf('\n')+1, message.length()), 
+					message.substring(0, message.indexOf('\n')), 
+					JOptionPane.PLAIN_MESSAGE);
+		f.repaint();
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 	
 		TablePanel eventPanel = (TablePanel) e.getComponent();
-		if (!drawingBlocked)
-			eventPanel.getField().getTable().endLine();
+		if (!drawingBlocked) {
+			String message = eventPanel.getField().getTable().endLine();
+			if (message != null)
+				JOptionPane.showMessageDialog(f, 
+						message.substring(message.indexOf('\n')+1, message.length()), 
+						message.substring(0, message.indexOf('\n')), 
+						JOptionPane.PLAIN_MESSAGE);
+		}
 		drawingBlocked = false;
-		eventPanel.getTopLevelAncestor().repaint();
-		eventPanel.repaint();
+		f.repaint();
 
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		//this mouselistener should only be added to TablePanel
+		//this mouse listener should only be added to TablePanel
 		if ((e.getModifiersEx() & e.BUTTON1_DOWN_MASK) != 0 && drawingBlocked == false) {
 			TablePanel eventPanel = (TablePanel) e.getComponent();
 			Field nextNode = eventPanel.getField();
-			if (!nextNode.getTable().addLinePiece(nextNode)) {
+			String message = nextNode.getTable().addLinePiece(nextNode);
+			if (message == "end") {
 				drawingBlocked = true;
 			}
-			eventPanel.getTopLevelAncestor().repaint();
-			eventPanel.repaint();
+			f.repaint();
+			if (message != null && Character.isUpperCase(message.charAt(0))) {
+				JOptionPane.showMessageDialog(f, 
+						message.substring(message.indexOf('\n')+1, message.length()), 
+						message.substring(0, message.indexOf('\n')), 
+						JOptionPane.PLAIN_MESSAGE);
+			}			
 		}
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		
+		//don't do anything
 	}
 }

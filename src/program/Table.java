@@ -3,7 +3,7 @@ package program;
 import java.util.Scanner;
 import java.io.*;
 
-public class Table {
+public class Table implements Serializable{
 	
 	private Field fields[][];
 	
@@ -45,10 +45,10 @@ public class Table {
 	public Table() {
 		fields = null;
 		line = null;
-		rollBack = null;
+		rollBack = new LineRollBack(5);
 	}
 	
-	//constructor
+	//construct table by parsing file
 	public Table(String filename) {	
 		rollBack = new LineRollBack(5);
 		//if loading non-saved table
@@ -58,15 +58,22 @@ public class Table {
 			ioe.printStackTrace();
 		}
 		line = null;
-		//if loading user saved table
 	}
 	
 	public LineRollBack getRollBack() {
 		return rollBack;
 	}
 	
+	public void setRollBack(LineRollBack r) {
+		rollBack = r;
+	}
+	
 	public DrawnLine getLine() {
 		return line;
+	}
+	
+	public void setLine(DrawnLine l) {
+		line = l;
 	}
 	
 	public int getWidth() {
@@ -77,26 +84,34 @@ public class Table {
 		return fields.length;
 	}
 	
+	public Field[][] getFields() {
+		return fields;
+	}
+	
+	public void setFields(Field[][] f) {
+		fields = f;
+	}
+	
 	//returns the Field at the given positions
 	public Field getFieldAt(int x, int y) {
 		return fields[y][x];
 	}
 	
 	//called on mouse press
-	public void startLine(Field startNode) {
+	public String startLine(Field startNode) {
 		//if there is a previous line and it's a cycle, or the new one doesn't start on 
 		//the previous one's end point, drawing is blocked
 		if (line != null && line.isStartNode(line.getEnd()) && line.numOfNodes() != 1) {
-			System.out.println("Drawing is blocked. Remove cycle.");
+			return "Drawing is blocked \nRemove loop to draw.";
 		} else if (line != null && line.contains(startNode) && !line.isStartNode(startNode) && !line.isEndNode(startNode)) {
-			System.out.println("Drawing is blocked. Can't start in the middle of another line.");
+			return "Drawing is blocked \nCan't start in the middle of another line.";
 		} else {
 			rollBack.push(line);
 			//only want to keep the 2 latest lines 
 			if (rollBack.read(rollBack.size()-2)!= null) {
 				Field[] nodes = rollBack.read(rollBack.size()-2).getElements(0, rollBack.read(rollBack.size()-2).numOfNodes()-1);
 				for (Field n : nodes)  {
-					if (!line.contains(n)) {
+					if (line != null && !line.contains(n)) {
 						n.setHasLine(false);
 						n.setLine(null);
 					}
@@ -105,31 +120,31 @@ public class Table {
 			line = new DrawnLine(startNode);
 			startNode.setHasLine(true);
 			startNode.setLine(line);
-			
+			return null;
 		}
 	}
 	
-	//called on mouse drag, returns false if line was ended while the function ran
-	public boolean addLinePiece(Field nextNode) {
+	//called on mouse drag, returns with "end" if line was ended while the function ran
+	public String addLinePiece(Field nextNode) {
 		//only add node if the new one is a neighbor of the last (check legality of argument)
 		if (line != null && nextNode.isNeighbor(line.getEnd())) {
 			//this is only possible if the user moves the cursor fast enough, that it
 			//registers at a diagonal field as the next node. just end the line here
 			if (nextNode.isDiagonal(line.getEnd())) {
-				endLine();
-				return false;
+				String message = endLine();
+				return message == null ? message : "end";
 			}
 			//in this case, we have a cycle, and we need to finish it by adding the last node
 			if (line.isStartNode(nextNode) && line.numOfNodes() > 2) {
 				line.addNode(nextNode);
 				nextNode.setHasLine(true);
 				nextNode.setLine(line);
-				endLine();
-				return false;
+				String message = endLine();
+				return message != null ? message : "end";
 			//we need to end the line if it ends up back in itself (not at its start node)
 			} else if (line.contains(nextNode)) {
-				endLine();
-				return false;
+				String message = endLine();
+				return message != null ? message : "end";
 			//in this case, we might have a cycle, if we combine the two lines
 			} else if (rollBack.read(rollBack.size()-1) != null && rollBack.read(rollBack.size()-1).contains(nextNode)) {
 				//in this case we can connect the two lines, as the new one ends in one of the old one's end points
@@ -139,8 +154,8 @@ public class Table {
 					nextNode.setLine(line);
 				}
 				//then end the line, as it has run into the previous one
-				endLine(); 
-				return false;
+				String message = endLine();
+				return message != null ? message : "end";
 			//in any other case, add a node (except if the line is finished)
 			} else {
 				if (!line.getFinished()) {
@@ -148,22 +163,23 @@ public class Table {
 					nextNode.setHasLine(true);
 					nextNode.setLine(line);
 				}
-				return true;
+				return "finished";
 			}
 		} else {
 			//the argument was illegal (but no line was ended)
-			return true;
+			return "illegal";
 		}
-		
 	}
 	
 	//called on mouse release
-	public void endLine() {
+	public String endLine() {
+		//i don't know why, but sometimes it gets called with an empty line
+		if (line == null)
+			return null;
 		//finish line
 		line.setFinished(true);
 		//check for a cycle
 		if (line.getStart() == line.getEnd() && line.numOfNodes() > 2) {
-			System.out.println("It's a cycle!!");
 			if (rollBack.read(rollBack.size()-1)!= null) {
 				Field[] nodes = rollBack.read(rollBack.size()-1).getElements(0, rollBack.read(rollBack.size()-1).numOfNodes()-1);
 				for (Field n : nodes)  {
@@ -175,7 +191,9 @@ public class Table {
 			}
 			//check if win
 			boolean win = checkWin();
-			if (win) System.out.println("Victory!");
+			if (win) {
+				return "Victory \nCongratulations!";
+			}
 		} else {
 			//if there's no cycle, but there are two lines, try to connect them
 			if (rollBack.read(rollBack.size()-1) != null) {
@@ -185,10 +203,11 @@ public class Table {
 					line.connectWith(rollBack.read(rollBack.size()-1));
 					//after connecting, check again, if now there is a cycle
 					if (line.getStart() == line.getEnd() && line.numOfNodes() > 2) {
-						System.out.println("It's a cycle!!");
 						//check if win
 						boolean win = checkWin();
-						if (win) System.out.println("Victory!");
+						if (win) {
+							return "Victory \nCongratulations!";
+						}
 					}
 				//the lines end points are not the same
 				} else {
@@ -204,7 +223,8 @@ public class Table {
 					}
 				}
 			}
-		} 
+		}
+		return null;
 	}
 	
 	//only call if a cycle is guaranteed
@@ -267,6 +287,18 @@ public class Table {
 					prevLineNodes[i].setLine(null);
 				}
 			}
+		}
+	}
+	
+	static public void saveLine (Table t, int savedLevel) {
+		try {
+			FileOutputStream f = new FileOutputStream("gamesave" + savedLevel + ".dat");
+			ObjectOutputStream out = new ObjectOutputStream(f);
+			out.writeObject(t);
+			out.close();
+		}
+		catch(IOException ioe) {
+			ioe.printStackTrace();
 		}
 	}
 }

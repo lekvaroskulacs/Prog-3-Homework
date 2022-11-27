@@ -6,6 +6,9 @@ import java.awt.event.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import program.DrawnLine;
+import program.Field;
+import program.LineRollBack;
 import program.Table;
 
 import java.io.*;
@@ -14,13 +17,15 @@ public class GameFrame extends JFrame{
 	
 	Container contentPane;
 	
+	Table t = new Table();
+	
 	public GameFrame() {
 		super("Masyu");
-		setSize(1920, 1080);
+		setSize(1280, 720);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].setFullScreenWindow(this); <-- Fullscreen
-		setExtendedState(JFrame.MAXIMIZED_BOTH);  	// *
-		setUndecorated(true);						// <-- Windowed Fullscreen
+		//setExtendedState(JFrame.MAXIMIZED_BOTH);  	// *
+		//setUndecorated(true);						// <-- Windowed Fullscreen
 		contentPane = getContentPane();
 		
 		mainMenuSetup();
@@ -152,10 +157,8 @@ public class GameFrame extends JFrame{
 			GridBagConstraints textConstraint = new GridBagConstraints();
 			textConstraint.gridx = 0;
 			textConstraint.gridy = y;
-			textConstraint.ipadx = 150;
-			textConstraint.ipady = 115;
 			textConstraint.anchor = GridBagConstraints.PAGE_END;
-			textConstraint.insets = new Insets(100, 0, 0, 0);
+			textConstraint.insets = new Insets(0, 0, 60, 0);
 			switch (y) {
 			case 0: texts[y] = new JTextArea("Easy:"); break;
 			case 1: texts[y] = new JTextArea("Medium:"); break;
@@ -175,8 +178,6 @@ public class GameFrame extends JFrame{
 				GridBagConstraints buttonConstraint = new GridBagConstraints();
 				buttonConstraint.gridx = x + 1;
 				buttonConstraint.gridy = y;
-				buttonConstraint.ipadx = 150;
-				buttonConstraint.ipady = 75;
 				buttonConstraint.insets = new Insets(0, 20, 50, 20);
 				buttons[x][y] = new JButton("Level " + level);
 				buttons[x][y].setBackground(new Color(193, 158, 158));
@@ -185,7 +186,11 @@ public class GameFrame extends JFrame{
 				
 				buttons[x][y].addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
-						gameSetup(level);
+						int answer = JOptionPane.showConfirmDialog(null, "Load saved state?", "Question", JOptionPane.YES_NO_CANCEL_OPTION);
+						if (answer == 1)
+							gameSetup(level, false);
+						if (answer == 0)
+							gameSetup(level, true);
 					}
 				});
 			}
@@ -196,10 +201,9 @@ public class GameFrame extends JFrame{
 				mainMenuSetup();
 			}
 		});
-		
 	}
 	
-	public void gameSetup(int level) throws IllegalArgumentException {
+	public void gameSetup(int level, boolean deserialize) throws IllegalArgumentException {
 		contentPane.removeAll();
 		contentPane.repaint();
 		contentPane.revalidate();
@@ -209,44 +213,26 @@ public class GameFrame extends JFrame{
 		contentPane.add(centerPanel, BorderLayout.CENTER);
 		centerPanel.setLayout(new GridBagLayout());
 		centerPanel.setOpaque(false);
-		//initialize table
-		Table t = new Table();
-		switch (level) {
-		case 1: t = new Table("gamesave1.dat"); break;
-		case 2: break;
-		case 3: break;
-		case 4: break;
-		case 5: break;
-		case 6: break;
-		case 7: break;
-		case 8: break;
-		case 9: break;
-		default: throw new IllegalArgumentException("Not a level from 1-9");
+		//table setup
+		if (!deserialize)
+			t = new Table("level" + level + ".dat");
+		else {
+			try {
+				deserializeTable(t, level);
+			} catch(FileNotFoundException fnfe) {
+				JOptionPane.showMessageDialog(contentPane, "No save file yet for this level!", "File not found", JOptionPane.ERROR_MESSAGE);
+				chooseLevelSetup();
+				return;
+			} 
 		}
 		//Jmenu
-		JMenuSetup(t);
+		JMenuSetup(t, level);
 		//Back button
-		JPanel southPanel = new JPanel();
-		contentPane.add(southPanel, BorderLayout.SOUTH);
-		southPanel.setLayout(new GridBagLayout());
-		JButton back = new JButton("Back");
-		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.anchor = GridBagConstraints.EAST;
-		constraints.ipadx = 200;
-		constraints.ipady = 50;
-		southPanel.add(back, constraints);
-		southPanel.setOpaque(false);
-		back.setFont(new Font("Rockwell", Font.PLAIN, 40));
-		back.setBackground(new Color(193, 158, 158));
-		back.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				chooseLevelSetup();
-			}
-		});
+		backButtonSetup();
 		//game table panels 
 		int x = t.getWidth();
 		int y = t.getHeight();
-		
+		//table gui
 		TablePanel[][] panels = new TablePanel[x][y];
 		for (int j = 0; j < y; ++j) {
 			for (int i = 0; i < x; ++i) {
@@ -256,14 +242,34 @@ public class GameFrame extends JFrame{
 				panelConstraint.ipadx = 50;
 				panelConstraint.ipady = 50;
 				panels[i][j] = t.getFieldAt(i, j).getPanel();
-				panels[i][j].addMouseListener(new InGameMouseInputListener());
-				panels[i][j].addMouseMotionListener(new InGameMouseInputListener());
+				//remove previous mouse listeners
+				MouseListener[] m = panels[i][j].getMouseListeners();
+				for (MouseListener ml : m) {
+					panels[i][j].removeMouseListener(ml);
+				}
+				InGameMouseInputListener listener = new InGameMouseInputListener(this);
+				panels[i][j].addMouseListener(listener);
 				centerPanel.add(panels[i][j], panelConstraint);
 			}
 		}
 	}
 	
-	private void JMenuSetup(Table t) {
+	private void deserializeTable(Table t, int level) throws FileNotFoundException {
+		try {
+			FileInputStream f = new FileInputStream("gamesave" + level + ".dat");
+			ObjectInputStream in = new ObjectInputStream(f);
+			t = (Table)in.readObject();
+			in.close();
+		} catch(IOException ioe) {
+			if (ioe.getClass() == FileNotFoundException.class)
+				throw (FileNotFoundException)ioe;
+			ioe.printStackTrace();
+		} catch(ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
+		}
+	}
+	
+	private void JMenuSetup(Table t, int level) {
 		//add JMenu
 		JMenuBar menuBar = new JMenuBar();
 		JMenu options = new JMenu("Options");
@@ -277,17 +283,31 @@ public class GameFrame extends JFrame{
 		this.setJMenuBar(menuBar);
 		
 		//JMenu actionListeners
-		undo.addActionListener(new ActionListener() {
+		undo.addActionListener(new UndoActionListener(t, this));
+		delete.addActionListener(new DeleteActionListener(t, this));
+		save.addActionListener(new SaveActionListener(t, this, level));
+	}
+	
+	private void backButtonSetup() {
+		JPanel southPanel = new JPanel();
+		contentPane.add(southPanel, BorderLayout.SOUTH);
+		southPanel.setLayout(new GridLayout(2, 5, 30, 10));
+		JButton back = new JButton("Back");
+		for (int i = 0; i < 10; ++i) {
+			if (i != 2) {	
+				JPanel filler = new  JPanel();
+				filler.setOpaque(false);
+				southPanel.add(filler);
+			} else 
+				southPanel.add(back);
+		}
+		southPanel.setOpaque(false);
+		back.setFont(new Font("Rockwell", Font.PLAIN, 40));
+		back.setBackground(new Color(193, 158, 158));
+		back.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				t.undo();
-				repaint();
+				chooseLevelSetup();
 			}
 		});
-		delete.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				t.deleteLine();
-				repaint();
-			}
-		});
-	}		
+	}
 }

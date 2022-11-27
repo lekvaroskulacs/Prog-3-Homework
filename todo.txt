@@ -1,6 +1,6 @@
-- win condition check
-- line delete
-- line undo
-- serialization
+- win condition check (done)
+- line delete (done)
+- line undo (done)
+- serialization (done)
 - how to
 - aesthetic upgrade

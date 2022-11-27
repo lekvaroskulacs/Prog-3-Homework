@@ -1,12 +1,14 @@
 package program;
 
+import java.io.Serializable;
+
 import gui.*;
 
 
 /**
  * Also functions as a node in the graph of the drawn line.
  */
-abstract public class Field {
+abstract public class Field implements Serializable {
 	
 	protected int x;
 	
