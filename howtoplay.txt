@@ -1,0 +1,12 @@
+Masyu is played on a rectangular grid of squares, some of which contain circles; each circle is either "white" (empty) or "black" (filled). 
+The goal is to draw a single continuous non-intersecting loop that properly passes through all circled cells. 
+The loop must "enter" each cell it passes through from the center of one of its four sides and "exit" from a different side; all turns are therefore 90 degrees.
+
+The rules are simple:
+
+1. A black circle must have a line turning a corner on it, this line must continue one square after each side of the circle.
+2. A white circle must have a straight line through it, this line has another condition, it must turn a corner one square after the circle on either one of the ends or both of the ends.
+3. The line made must go to adjecent squares, there are no diagonals.
+4. The line must go in a full loop, both ends connecting.
+5. The line cannot overlap itself or branch off. (Drawing will be blocked in this case, don't be surprised.)
+6. Every change of direction other than straight has to be at a 90° angle.

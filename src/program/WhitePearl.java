@@ -10,6 +10,15 @@ public class WhitePearl extends Field {
 	}
 	
 	public boolean winConditionCheck(Field prevNode, Field nextNode) {
+		int prevPrev = table.getLine().getNodeIndex(prevNode) - 1;
+		int nextNext = table.getLine().getNodeIndex(nextNode) + 1;
+		if (prevPrev == -1)
+			prevPrev = table.getLine().numOfNodes()-2;
+		if (nextNext == table.getLine().numOfNodes())
+			nextNext = 1;
+		Field prevPrevNode = table.getLine().getElementAt(prevPrev);
+		Field nextNextNode = table.getLine().getElementAt(nextNext);
+		
 		boolean ret = true;
 		if (directionOfNeighbor(prevNode) == Direction.south && directionOfNeighbor(nextNode) != Direction.north)
 			ret = false;
@@ -19,6 +28,10 @@ public class WhitePearl extends Field {
 			ret = false;
 		if (directionOfNeighbor(prevNode) == Direction.east && directionOfNeighbor(nextNode) != Direction.west)
 			ret = false;
+		
+		if (!isNinetyDegreeTurn(prevNode, prevPrevNode) && !isNinetyDegreeTurn(nextNode, nextNextNode))
+			ret = false;
+		
 		return ret;
 	}
 	

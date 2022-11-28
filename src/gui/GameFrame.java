@@ -12,6 +12,7 @@ import program.LineRollBack;
 import program.Table;
 
 import java.io.*;
+import java.util.Scanner;
 
 public class GameFrame extends JFrame{
 	
@@ -106,20 +107,33 @@ public class GameFrame extends JFrame{
 		contentPane.repaint();
 		contentPane.revalidate();
 		this.setJMenuBar(null);
-		contentPane.setLayout(new GridLayout(4, 4, 0, 0));
-		JPanel[][] panelHolder = new JPanel[4][6];
-		
-		for (int i = 0; i < 4; ++i) {
-			for (int j = 0; j < 6; ++j) {
-				panelHolder[i][j] = new JPanel();
-				contentPane.add(panelHolder[i][j]);
-				panelHolder[i][j].setOpaque(false);
-			}
-		}
-		
+		contentPane.setLayout(new GridBagLayout());
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = 0;
+		constraints.gridy = 1;
+		constraints.insets = new Insets(100, 0, 0, 0);
+		JTextArea text = new JTextArea();
+		JScrollPane jsp = new JScrollPane(text);
 		JButton back = new JButton("Back");
-		panelHolder[3][4].setLayout(new GridLayout(2, 1, 0, 0));
-		panelHolder[3][4].add(back);
+		contentPane.add(back, constraints);
+		constraints.gridy = 0;
+		constraints.ipadx = 700;
+		constraints.ipady = 400;
+		contentPane.add(jsp, constraints);
+		
+		text.setLineWrap(true);
+		text.setWrapStyleWord(true);
+		String content = "";
+		try {
+			Scanner sc = new Scanner(new File("howtoplay.txt"));
+			content = sc.useDelimiter("\\Z").next();
+			sc.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		text.setBackground(Color.gray);
+		text.setFont(new Font("Rockwell", Font.PLAIN, 20));
+		text.setText(content);
 		
 		back.setBackground(new Color(193, 158, 158));
 		back.setFont(new Font("Rockwell", Font.PLAIN, 40));

@@ -83,8 +83,12 @@ abstract public class Field implements Serializable {
 	}
 	
 	public Direction directionOfNeighbor(Field f) throws IllegalArgumentException {
-		if (!isNeighbor(f))
-			throw new IllegalArgumentException();
+		if (line.numOfNodes() < 3 && 
+			!(this == line.getElementAt(line.numOfNodes()-2) || this == line.getElementAt(1))) {
+			if (!isNeighbor(f))
+				throw new IllegalArgumentException();
+		}
+		
 		if (x < f.getX()) 
 			return Direction.east;
 		else if (x > f.getX())
@@ -93,6 +97,19 @@ abstract public class Field implements Serializable {
 			return Direction.south;
 		else 
 			return Direction.north;
+	}
+	
+	public boolean isNinetyDegreeTurn(Field node1, Field node2) {
+		boolean result = true;
+		if (directionOfNeighbor(node1) == Direction.south && node1.directionOfNeighbor(node2) == Direction.south)
+			result = false;
+		if (directionOfNeighbor(node1) == Direction.east && node1.directionOfNeighbor(node2) == Direction.east)
+			result = false;
+		if (directionOfNeighbor(node1) == Direction.north && node1.directionOfNeighbor(node2) == Direction.north)
+			result = false;
+		if (directionOfNeighbor(node1) == Direction.west && node1.directionOfNeighbor(node2) == Direction.west)
+			result = false;
+		return result;
 	}
 	
 	/**
