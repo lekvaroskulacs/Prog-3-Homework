@@ -22,7 +22,8 @@ public class GameFrame extends JFrame{
 	
 	public GameFrame() {
 		super("Masyu");
-		setSize(1280, 720);
+		setSize(1600, 900);
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].setFullScreenWindow(this); <-- Fullscreen
 		//setExtendedState(JFrame.MAXIMIZED_BOTH);  	// *
@@ -229,10 +230,10 @@ public class GameFrame extends JFrame{
 		centerPanel.setOpaque(false);
 		//table setup
 		if (!deserialize)
-			t = new Table("level" + level + ".dat");
+			t = new Table("leveldata" + File.separator + "level" + level + ".dat");
 		else {
 			try {
-				deserializeTable(t, level);
+				Table.deserializeTable(t, level);
 			} catch(FileNotFoundException fnfe) {
 				JOptionPane.showMessageDialog(contentPane, "No save file yet for this level!", "File not found", JOptionPane.ERROR_MESSAGE);
 				chooseLevelSetup();
@@ -265,21 +266,6 @@ public class GameFrame extends JFrame{
 				panels[i][j].addMouseListener(listener);
 				centerPanel.add(panels[i][j], panelConstraint);
 			}
-		}
-	}
-	
-	private void deserializeTable(Table t, int level) throws FileNotFoundException {
-		try {
-			FileInputStream f = new FileInputStream("gamesave" + level + ".dat");
-			ObjectInputStream in = new ObjectInputStream(f);
-			t = (Table)in.readObject();
-			in.close();
-		} catch(IOException ioe) {
-			if (ioe.getClass() == FileNotFoundException.class)
-				throw (FileNotFoundException)ioe;
-			ioe.printStackTrace();
-		} catch(ClassNotFoundException cnfe) {
-			cnfe.printStackTrace();
 		}
 	}
 	

@@ -2,5 +2,5 @@
 - line delete (done)
 - line undo (done)
 - serialization (done)
-- how to
-- aesthetic upgrade
+- how to (done)
+- aesthetic upgrade (done)

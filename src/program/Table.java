@@ -162,8 +162,9 @@ public class Table implements Serializable{
 					line.addNode(nextNode);
 					nextNode.setHasLine(true);
 					nextNode.setLine(line);
+					return "added";
 				}
-				return "finished";
+				return "end";
 			}
 		} else {
 			//the argument was illegal (but no line was ended)
@@ -240,8 +241,8 @@ public class Table implements Serializable{
 			Field prevNode =  line.getElementAt(line.getNodeIndex(n)-1);
 			Field nextNode = line.getElementAt(line.getNodeIndex(n)+1);
 			//because we're guaranteed a cycle
-			if (prevNode == null) prevNode = line.getEnd();
-			if (nextNode == null) nextNode = line.getStart();
+			if (prevNode == null) prevNode = line.getElementAt(line.numOfNodes()-2);
+			if (nextNode == null) nextNode = line.getElementAt(1);
 			win = n.winConditionCheck(prevNode, nextNode);
 			if (win == false)
 				break;
@@ -290,15 +291,30 @@ public class Table implements Serializable{
 		}
 	}
 	
-	static public void saveLine (Table t, int savedLevel) {
+	static public void serializeTable(Table t, int savedLevel) {
 		try {
-			FileOutputStream f = new FileOutputStream("gamesave" + savedLevel + ".dat");
+			FileOutputStream f = new FileOutputStream("savedata"+ File.separator + "gamesave" + savedLevel + ".dat");
 			ObjectOutputStream out = new ObjectOutputStream(f);
 			out.writeObject(t);
 			out.close();
 		}
 		catch(IOException ioe) {
 			ioe.printStackTrace();
+		}
+	}
+	
+	static public void deserializeTable(Table t, int level) throws FileNotFoundException {
+		try {
+			FileInputStream f = new FileInputStream("savedata" + File.separator + "gamesave" + level + ".dat");
+			ObjectInputStream in = new ObjectInputStream(f);
+			t = (Table)in.readObject();
+			in.close();
+		} catch(IOException ioe) {
+			if (ioe.getClass() == FileNotFoundException.class)
+				throw (FileNotFoundException)ioe;
+			ioe.printStackTrace();
+		} catch(ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
 		}
 	}
 }

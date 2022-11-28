@@ -24,7 +24,7 @@ public class SaveActionListener implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Table.saveLine(t, level);
+		Table.serializeTable(t, level);
 		JOptionPane.showMessageDialog(f.getContentPane(), "Saved", "Confirmation", JOptionPane.NO_OPTION);
 	}
 
