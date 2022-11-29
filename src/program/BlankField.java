@@ -9,6 +9,9 @@ public class BlankField extends Field {
 		panel = new EmptyPanel(this);
 	}
 	
+	/**
+	 * In the case of a BlankField, always returns true.
+	 */
 	public boolean winConditionCheck(Field prevNode, Field nextNode) {
 		return true;
 	}

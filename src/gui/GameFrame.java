@@ -14,11 +14,15 @@ import program.Table;
 import java.io.*;
 import java.util.Scanner;
 
+/**
+ * The frame of the application.
+ *
+ */
 public class GameFrame extends JFrame{
 	
-	Container contentPane;
+	private Container contentPane;
 	
-	Table t = new Table();
+	private Table t = new Table();
 	
 	public GameFrame() {
 		super("Masyu");
@@ -33,6 +37,9 @@ public class GameFrame extends JFrame{
 		mainMenuSetup();
 	}
 	
+	/**
+	 * Loads the main menu view.
+	 */
 	public void mainMenuSetup() {
 		contentPane.removeAll();
 		contentPane.repaint();
@@ -103,6 +110,9 @@ public class GameFrame extends JFrame{
 		
 	}
 	
+	/**
+	 * Loads the how to play view.
+	 */
 	public void howToPlaySetup() {
 		contentPane.removeAll();
 		contentPane.repaint();
@@ -148,6 +158,9 @@ public class GameFrame extends JFrame{
 		contentPane.repaint();
 	}
 	
+	/**
+	 * Loads the choose level view.
+	 */
 	public void chooseLevelSetup() {
 		contentPane.removeAll();
 		contentPane.repaint();
@@ -218,6 +231,12 @@ public class GameFrame extends JFrame{
 		});
 	}
 	
+	/**
+	 * Loads the game view.
+	 * @param level the level to load.
+	 * @param deserialize whether to load a previous save or not.
+	 * @throws IllegalArgumentException if the specified level doesn't exist.
+	 */
 	public void gameSetup(int level, boolean deserialize) throws IllegalArgumentException {
 		contentPane.removeAll();
 		contentPane.repaint();
@@ -269,6 +288,11 @@ public class GameFrame extends JFrame{
 		}
 	}
 	
+	/**
+	 * Sets up the JMenu.
+	 * @param t the Table to give to the action listeners.
+	 * @param level the level to give to SaveActionListener.
+	 */
 	private void JMenuSetup(Table t, int level) {
 		//add JMenu
 		JMenuBar menuBar = new JMenuBar();
@@ -288,6 +312,9 @@ public class GameFrame extends JFrame{
 		save.addActionListener(new SaveActionListener(t, this, level));
 	}
 	
+	/**
+	 * Sets up the back button in the game view.
+	 */
 	private void backButtonSetup() {
 		JPanel southPanel = new JPanel();
 		contentPane.add(southPanel, BorderLayout.SOUTH);

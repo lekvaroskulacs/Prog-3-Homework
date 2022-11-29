@@ -11,6 +11,9 @@ public class EmptyPanel extends TablePanel {
 		f = field;
 	}
 	
+	/**
+	 * Paints the cell where this panel is located.
+	 */
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);

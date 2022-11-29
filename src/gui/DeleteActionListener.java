@@ -7,17 +7,25 @@ import javax.swing.JFrame;
 
 import program.Table;
 
+/**
+ * An action listener that generates an event, when the current line
+ * from the table needs to be deleted (when the user clicks "Delete").
+ *
+ */
 public class DeleteActionListener implements ActionListener{
 
-	Table t;
+	private Table t;
 	
-	JFrame f;
+	private JFrame f;
 	
 	public DeleteActionListener(Table t, JFrame f) {
 		this.t = t;
 		this.f = f;
 	}
 	
+	/**
+	 * Deletes the current line from the table.
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		t.deleteLine();

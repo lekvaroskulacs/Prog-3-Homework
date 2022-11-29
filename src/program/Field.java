@@ -6,7 +6,9 @@ import gui.*;
 
 
 /**
- * Also functions as a node in the graph of the drawn line.
+ * A Field that makes up the Table the game is played on.
+ * Also functions as a node in the line that user might draw.
+ * Is an abstract class, that has three possible implementations.
  */
 abstract public class Field implements Serializable {
 	
@@ -63,6 +65,11 @@ abstract public class Field implements Serializable {
 		this.y = y;
 	}
  	
+	/**
+	 * Checks if given Field is a neighbor of this Field on the table.
+	 * @param f the field to be examined
+	 * @return if f is neighbor of this
+	 */
 	public boolean isNeighbor(Field f) {
 		boolean ret = false;
 		//if their x and y coordinates are 1 away at most
@@ -74,6 +81,11 @@ abstract public class Field implements Serializable {
 		return ret;
 	}
 	
+	/**
+	 * Checks if given Field is diagonally one square away from this Field on the Table.
+	 * @param f the field to be examined
+	 * @return if f is neighbor of this
+	 */
 	public boolean isDiagonal(Field f) {
 		boolean ret = false;
 		//if both their coordinates are one apart
@@ -82,6 +94,12 @@ abstract public class Field implements Serializable {
 		return ret;
 	}
 	
+	/**
+	 * Returns the Direction in which the given field is, in relation to this Field
+	 * @param f the field to be examined
+	 * @return the Direction of f in relation to this Field
+	 * @throws IllegalArgumentException
+	 */
 	public Direction directionOfNeighbor(Field f) throws IllegalArgumentException {
 		if (line.numOfNodes() < 3 && 
 			!(this == line.getElementAt(line.numOfNodes()-2) || this == line.getElementAt(1))) {
@@ -99,6 +117,13 @@ abstract public class Field implements Serializable {
 			return Direction.north;
 	}
 	
+	/**
+	 * Returns whether the line defined by this, node1 and node2 is a ninety degree turn,
+	 * meaning that it changes direction.
+	 * @param node1 the first node
+	 * @param node2 the second node
+	 * @return Whether the line defined by this, node1 and node2 is a ninety degree turn
+	 */
 	public boolean isNinetyDegreeTurn(Field node1, Field node2) {
 		boolean result = true;
 		if (directionOfNeighbor(node1) == Direction.south && node1.directionOfNeighbor(node2) == Direction.south)
@@ -113,12 +138,21 @@ abstract public class Field implements Serializable {
 	}
 	
 	/**
-	 * Checks if the line passes through the node correctly
-	 * @return
+	 * Checks if the line defined by prevNode, this and nextNode 
+	 * passes through this node correctly, in context of Masyu rules, 
+	 * or in other words, if the win condition applies to this Field.
+	 * @param prevNode
+	 * @param nextNode
+	 * @return true if the win condition applies to this field
 	 */
 	abstract public boolean winConditionCheck(Field prevNode, Field nextNode);
 	
-	//checks if the given field is a pearl, and if it is, is it in the cycle
+	/**
+	 * Checks is this Field is in the cycle of the Table's line, if it is needed to be. 
+	 * Therefore, only call this, if a cycle is guaranteed.
+	 * A BlankField does not need to be part of the cycle, but pearls are required, according to Masyu rules.
+	 * @return true if this Field is part of the cycle, or it doesn't need to be part of it.
+	 */
 	abstract public boolean pearlInCycle();
 
 }

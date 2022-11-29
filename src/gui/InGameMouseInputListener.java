@@ -6,10 +6,14 @@ import javax.swing.*;
 
 import program.Field;
 
-//should only be added to TablePanel
+/**
+ * The mouse listener that's added to the TablePanels.
+ * Calls the correct Table functions on the corresponding user inputs.
+ *
+ */
 public class InGameMouseInputListener implements MouseListener {
 	
-	JFrame f;
+	private JFrame f;
 	
 	public InGameMouseInputListener(JFrame f) {
 		this.f = f;
@@ -17,11 +21,17 @@ public class InGameMouseInputListener implements MouseListener {
 	
 	static private boolean drawingBlocked = false;
 
+	/**
+	 * Unimplemented.
+	 */
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		//don't do anything
 	}
 
+	/**
+	 * Starts a line in the table, and opens a dialogue when necessary.
+	 */
 	@Override
 	public void mousePressed(MouseEvent e) {
 
@@ -36,6 +46,9 @@ public class InGameMouseInputListener implements MouseListener {
 		f.repaint();
 	}
 
+	/**
+	 * Finishes the line in the table, and opens a dialogue when necessary.
+	 */
 	@Override
 	public void mouseReleased(MouseEvent e) {
 	
@@ -53,6 +66,9 @@ public class InGameMouseInputListener implements MouseListener {
 
 	}
 
+	/**
+	 * Adds a node to the line in the table, and opens a dialogue when necessary.
+	 */
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		//this mouse listener should only be added to TablePanel
@@ -73,6 +89,9 @@ public class InGameMouseInputListener implements MouseListener {
 		}
 	}
 
+	/**
+	 * Unimplemented.
+	 */
 	@Override
 	public void mouseExited(MouseEvent e) {
 		//don't do anything

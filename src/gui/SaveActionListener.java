@@ -8,13 +8,18 @@ import javax.swing.JOptionPane;
 
 import program.Table;
 
+/**
+ * An action listener that generates an event, when the
+ * Table needs to be saved. (user clicks "Save")
+ *
+ */
 public class SaveActionListener implements ActionListener {
 
-	Table t;
+	private Table t;
 	
-	JFrame f;
+	private JFrame f;
 	
-	int level;
+	private int level;
 	
 	public SaveActionListener(Table t, JFrame f, int level) {
 		this.t = t;
@@ -22,6 +27,9 @@ public class SaveActionListener implements ActionListener {
 		this.level = level;
 	}
 	
+	/**
+	 * Saves the table, and shows a confirmation dialogue.
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Table.serializeTable(t, level);

@@ -10,6 +10,9 @@ public class WhitePearlPanel extends TablePanel {
 		f = field;
 	}
 	
+	/**
+	 * Paints the cell where this panel is located, and a white pearl inside it.
+	 */
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);

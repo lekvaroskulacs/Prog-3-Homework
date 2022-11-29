@@ -11,6 +11,9 @@ public class BlackPearlPanel extends TablePanel {
 		f = field;
 	}
 
+	/**
+	 * Paints the cell where this panel is located, and a black pearl inside it.
+	 */
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);

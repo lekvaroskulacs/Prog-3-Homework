@@ -3,6 +3,11 @@ package program;
 import java.util.Scanner;
 import java.io.*;
 
+/**
+ * The Table on which the game is played. Responsible for managing
+ * the line that the user draws, and checking for the correct solution.
+ *
+ */
 public class Table implements Serializable{
 	
 	private Field fields[][];
@@ -11,9 +16,13 @@ public class Table implements Serializable{
 	
 	private LineRollBack rollBack;
 	
-	//tested, works fine.
-	//parses a file, and initializes fields[][] based on it
-	//required file format can be seen in the "gamesave.dat" file
+	/**
+	 * Parses and initializes a Table from the specified file.
+	 * The file has a special format, which can be seen in the "levelX.dat"
+	 * files. The format is not specified any further.
+	 * @param filename the name of the file to parse from.
+	 * @throws IOException
+	 */
 	private void parseTableFromFile(String filename) throws IOException {
 		File f = new File(filename);
 		FileInputStream fi = new FileInputStream(f);
@@ -42,13 +51,19 @@ public class Table implements Serializable{
 		sc.close();
 	}
 	
+	/**
+	 * Constructs an empty Table
+	 */
 	public Table() {
 		fields = null;
 		line = null;
 		rollBack = new LineRollBack(5);
 	}
 	
-	//construct table by parsing file
+	/**
+	 * Construct a Table from specified file.
+	 * @param filename the name of the file in which the table data is saved.
+	 */
 	public Table(String filename) {	
 		rollBack = new LineRollBack(5);
 		//if loading non-saved table
@@ -76,10 +91,18 @@ public class Table implements Serializable{
 		line = l;
 	}
 	
+	/**
+	 * Returns the width of the Table, measured in number of Fields.
+	 * @return the amount of Fields that the table holds horizontally.
+	 */
 	public int getWidth() {
 		return fields[0].length;
 	}
 	
+	/**
+	 * Returns the height of the Table, measured in number of Fields.
+	 * @return the amount of Fields that the table holds vertically.
+	 */
 	public int getHeight() {
 		return fields.length;
 	}
@@ -92,12 +115,25 @@ public class Table implements Serializable{
 		fields = f;
 	}
 	
-	//returns the Field at the given positions
+	/**
+	 * Returns the field at the specified position.
+	 * @param x the x coordinate of the field.
+	 * @param y the y coordinate of the field.
+	 * @return
+	 */
 	public Field getFieldAt(int x, int y) {
 		return fields[y][x];
 	}
 	
-	//called on mouse press
+	/**
+	 * Starts a line, and pushes the current one to the rollBack.
+	 * Depending on the startNode, it might cancel this behavior, while returning a
+	 * message specifying the reason. This might be because: the user tried to drawn
+	 * in the middle of an already existing line, or the user tried to draw while a 
+	 * cycle was in place.
+	 * @param startNode the starting node of the line.
+	 * @return the error message, or null if there is no error.
+	 */
 	public String startLine(Field startNode) {
 		//if there is a previous line and it's a cycle, or the new one doesn't start on 
 		//the previous one's end point, drawing is blocked
@@ -124,7 +160,15 @@ public class Table implements Serializable{
 		}
 	}
 	
-	//called on mouse drag, returns with "end" if line was ended while the function ran
+	/**
+	 * Adds another node to the line. Returns with null, if
+	 * the argument is illegal. This happens if the argument Field is not
+	 * a neighbor of the end of the current line. The line might also get ended
+	 * in some cases, which might also cause a victory to happen. The result of the
+	 * method is specified in the return string, which can have multiple values.
+	 * @param nextNode the node to be added.
+	 * @return a short message explaining the result of the method.
+	 */
 	public String addLinePiece(Field nextNode) {
 		//only add node if the new one is a neighbor of the last (check legality of argument)
 		if (line != null && nextNode.isNeighbor(line.getEnd())) {
@@ -172,7 +216,11 @@ public class Table implements Serializable{
 		}
 	}
 	
-	//called on mouse release
+	/**
+	 * Finished the current line, and checks for a correct solution, if the now
+	 * finished line is a cycle.
+	 * @return a congratulatory message in case of a victory, otherwise null.
+	 */
 	public String endLine() {
 		//i don't know why, but sometimes it gets called with an empty line
 		if (line == null)
@@ -228,7 +276,11 @@ public class Table implements Serializable{
 		return null;
 	}
 	
-	//only call if a cycle is guaranteed
+	/**
+	 * Checks if the win conditions apply to the current cycle.
+	 * Only call, if the current line is guaranteed to be a cycle.
+	 * @return true if the win conditions apply.
+	 */
 	public boolean checkWin() {
 		boolean win = true;
 		Field[] nodes = line.getElements(0, line.numOfNodes()-1);
@@ -250,6 +302,10 @@ public class Table implements Serializable{
 		return win;
 	}
 	
+	/**
+	 * Undoes the previous step, meaning that the line returns
+	 * to the state it was before the latest user interaction.
+	 */
 	public void undo() {
 		//invalidate current line
 		if (line != null) {
@@ -263,12 +319,20 @@ public class Table implements Serializable{
 		lineRevalidate();
 	}
 	
+	/**
+	 * Replaces the current line with null (empties the table).
+	 */
 	public void deleteLine() {
 		rollBack.push(line);
 		line = null;
 		lineRevalidate();
 	}
 	
+	/**
+	 * Validates the current state of the line. Needs to be called if
+	 * the line is modified outside of the xxxLine() methods of Table, for example
+	 * in undo() and deleteLine().
+	 */
 	public void lineRevalidate() {
 		//if line is not null, validate the current line
 		if (line != null) {
@@ -291,6 +355,13 @@ public class Table implements Serializable{
 		}
 	}
 	
+	/**
+	 * Saves the current state of the specified table into the save file
+	 * specified in savedLevel. For example, if savedLevel is 2, the table
+	 * will be saved in the "gamesave2.dat" file.
+	 * @param t the Table to be serialized.
+	 * @param savedLevel the level which the table corresponds to.
+	 */
 	static public void serializeTable(Table t, int savedLevel) {
 		try {
 			FileOutputStream f = new FileOutputStream("savedata"+ File.separator + "gamesave" + savedLevel + ".dat");
@@ -303,6 +374,12 @@ public class Table implements Serializable{
 		}
 	}
 	
+	/**
+	 * Deserializes a previously saved table from the file specified by level.
+	 * @param t the Table to deserialize the data to.
+	 * @param level the level which the data corresponds to.
+	 * @throws FileNotFoundException if the file doesn't exist (yet).
+	 */
 	static public void deserializeTable(Table t, int level) throws FileNotFoundException {
 		try {
 			FileInputStream f = new FileInputStream("savedata" + File.separator + "gamesave" + level + ".dat");

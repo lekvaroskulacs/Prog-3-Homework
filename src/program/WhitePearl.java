@@ -9,6 +9,7 @@ public class WhitePearl extends Field {
 		panel = new WhitePearlPanel(this);
 	}
 	
+	@Override
 	public boolean winConditionCheck(Field prevNode, Field nextNode) {
 		int prevPrev = table.getLine().getNodeIndex(prevNode) - 1;
 		int nextNext = table.getLine().getNodeIndex(nextNode) + 1;
